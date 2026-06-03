@@ -11,7 +11,7 @@
 
   const DEFAULTS = {
     blocks: [],            // [{ id, domain, label, endTime, createdAt, unlockedUntil }]
-    schedules: [],         // [{ id, domain, label, days:[0-6], start:"HH:MM", end:"HH:MM" }]
+    schedules: [],         // [{ id, label, domains:[], days:[0-6], start:"HH:MM", end:"HH:MM" }]
     scheduleUnlocks: {},    // { [scheduleId]: timestampMs }
     presets: [],           // [{ id, name, domains:[] }]
     settings: {
@@ -40,6 +40,9 @@
     const raw = await chrome.storage.local.get(DEFAULTS);
     raw.settings = Object.assign({}, DEFAULTS.settings, raw.settings);
     raw.stats = Object.assign({}, DEFAULTS.stats, raw.stats);
+    // Migrate older single-domain schedules to the domains[] shape.
+    raw.schedules = (raw.schedules || []).map(s =>
+      Array.isArray(s.domains) ? s : Object.assign({}, s, { domains: s.domain ? [s.domain] : [] }));
     return raw;
   }
   function set(partial) {
@@ -126,10 +129,12 @@
     }
 
     for (const s of state.schedules) {
-      if (scheduleActive(s, now) && hostMatches(host, s.domain)) {
+      const domains = Array.isArray(s.domains) ? s.domains : (s.domain ? [s.domain] : []);
+      const matched = scheduleActive(s, now) && domains.find(d => hostMatches(host, d));
+      if (matched) {
         const u = state.scheduleUnlocks[s.id];
         if (!(u && u > now)) {
-          candidates.push({ key: 'sched:' + s.id, kind: 'schedule', domain: s.domain, endTime: scheduleWindowEnd(s, now) });
+          candidates.push({ key: 'sched:' + s.id, kind: 'schedule', domain: matched, endTime: scheduleWindowEnd(s, now) });
         }
       }
     }

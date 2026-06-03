@@ -30,36 +30,40 @@
       <p class="muted sub" id="statExtra"></p>
     </section>
 
-    <!-- SCHEDULES -->
-    <section class="card">
-      <h2>Recurring schedules</h2>
-      <p class="muted hint">
-        Automatically lock a site on the days and hours you choose. Overnight windows
-        (e.g. 22:00 to 06:00) are supported.
-      </p>
-      <ul id="scheduleList" class="list"></ul>
-      <div class="form">
-        <input id="schedDomain" type="text" placeholder="site, e.g. reddit.com" />
-        <div class="days" id="days"></div>
-        <div class="row">
-          <label>From <input id="schedStart" type="time" value="09:00" /></label>
-          <label>to <input id="schedEnd" type="time" value="17:00" /></label>
-          <button id="addSchedule" class="btn-primary">Add schedule</button>
-        </div>
-      </div>
-    </section>
-
     <!-- PRESETS -->
     <section class="card">
       <h2>Block-list groups</h2>
       <p class="muted hint">
-        Save reusable bundles of sites. They show up as one-tap buttons in the popup.
+        Save reusable bundles of sites. Use them as one-tap buttons in the popup, or
+        add a whole group to a recurring schedule below.
       </p>
       <ul id="presetList" class="list"></ul>
       <div class="form">
         <input id="presetName" type="text" placeholder="group name, e.g. Social" />
         <input id="presetDomains" type="text" placeholder="sites, comma or space separated" />
         <button id="addPreset" class="btn-primary self-start">Add group</button>
+      </div>
+    </section>
+
+    <!-- SCHEDULES -->
+    <section class="card">
+      <h2>Recurring schedules</h2>
+      <p class="muted hint">
+        Automatically lock sites on the days and hours you choose. Add individual sites
+        or tap a group, then pick the days and window. Overnight windows (e.g. 22:00 to
+        06:00) are supported.
+      </p>
+      <ul id="scheduleList" class="list"></ul>
+      <div class="form">
+        <div id="schedGroups" class="preset-row"></div>
+        <div id="schedChips" class="chips"></div>
+        <input id="schedDomain" type="text" placeholder="add a site, press Enter" />
+        <div class="days" id="days"></div>
+        <div class="row">
+          <label>From <input id="schedStart" type="time" value="09:00" /></label>
+          <label>to <input id="schedEnd" type="time" value="17:00" /></label>
+          <button id="addSchedule" class="btn-primary">Add schedule</button>
+        </div>
       </div>
     </section>
 
@@ -83,7 +87,7 @@
       <label class="setting-row">
         <span>
           <strong>Hardened mode</strong>
-          <span class="muted sub">Ending a lock, pausing, or breaking through requires typing a commitment phrase first.</span>
+          <span class="muted sub">Ending a lock or breaking through requires typing a commitment phrase first.</span>
         </span>
         <input id="hardened" type="checkbox" />
       </label>

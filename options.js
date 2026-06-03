@@ -22,7 +22,6 @@ async function renderStats() {
   document.getElementById('statFocus').textContent =
     hrs >= 1 ? `${Math.round(hrs)}h` : `${stats.focusMin || 0}m`;
 
-  // last 7 days chart of committed focus minutes
   const chart = document.getElementById('chart');
   chart.innerHTML = '';
   const days = [];
@@ -52,13 +51,92 @@ async function renderStats() {
     `Best streak: ${stats.bestStreak || 0} days · ${stats.sessionsStarted || 0} sessions started · broke through ${stats.brokeThrough || 0} times`;
 }
 
+// ==================================================================== PRESETS
+const presetList = document.getElementById('presetList');
+const presetName = document.getElementById('presetName');
+const presetDomains = document.getElementById('presetDomains');
+
+async function renderPresets() {
+  const { presets } = await FL.getAll();
+  presetList.innerHTML = '';
+  for (const p of presets) {
+    presetList.appendChild(listItem(p.name, p.domains.join(', '), () => removePreset(p.id)));
+  }
+  renderSchedGroups(); // schedule form offers the same groups
+}
+
+document.getElementById('addPreset').addEventListener('click', async () => {
+  const name = presetName.value.trim();
+  const domains = presetDomains.value.split(/[,\s]+/).map(FL.normalizeDomain).filter(Boolean);
+  if (!name || !domains.length) { presetName.focus(); return; }
+  const { presets } = await FL.getAll();
+  presets.push({ id: FL.uid(), name, domains: [...new Set(domains)] });
+  await FL.set({ presets });
+  presetName.value = ''; presetDomains.value = '';
+  renderPresets(); flashSaved();
+});
+
+async function removePreset(id) {
+  const { presets } = await FL.getAll();
+  await FL.set({ presets: presets.filter(p => p.id !== id) });
+  renderPresets();
+}
+
 // ================================================================== SCHEDULES
 const scheduleList = document.getElementById('scheduleList');
+const schedGroups = document.getElementById('schedGroups');
+const schedChips = document.getElementById('schedChips');
 const schedDomain = document.getElementById('schedDomain');
 const daysEl = document.getElementById('days');
 const schedStart = document.getElementById('schedStart');
 const schedEnd = document.getElementById('schedEnd');
+
+let schedSites = [];                 // staged domains for the schedule being built
 let pickedDays = [1, 2, 3, 4, 5];
+
+// group buttons (mirror the popup): tapping one adds its domains to the staging list
+async function renderSchedGroups() {
+  const { presets } = await FL.getAll();
+  schedGroups.innerHTML = '';
+  for (const p of presets) {
+    if (!p.domains || !p.domains.length) continue;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'preset-btn';
+    b.textContent = p.name;
+    b.title = p.domains.join(', ');
+    b.addEventListener('click', () => {
+      for (const d of p.domains) if (!schedSites.includes(d)) schedSites.push(d);
+      renderSchedChips();
+    });
+    schedGroups.appendChild(b);
+  }
+}
+
+function renderSchedChips() {
+  schedChips.innerHTML = '';
+  schedSites.forEach((d, i) => {
+    const chip = document.createElement('span');
+    chip.className = 'chip';
+    chip.textContent = d;
+    const x = document.createElement('button');
+    x.textContent = '×';
+    x.title = 'Remove';
+    x.addEventListener('click', () => { schedSites.splice(i, 1); renderSchedChips(); });
+    chip.appendChild(x);
+    schedChips.appendChild(chip);
+  });
+}
+
+function addSchedSite() {
+  const d = FL.normalizeDomain(schedDomain.value);
+  schedDomain.value = '';
+  if (d && !schedSites.includes(d)) { schedSites.push(d); renderSchedChips(); }
+}
+schedDomain.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addSchedSite(); }
+});
+schedDomain.addEventListener('blur', addSchedSite);
 
 function renderDayPicker() {
   daysEl.innerHTML = '';
@@ -87,59 +165,38 @@ async function renderSchedules() {
   const { schedules } = await FL.getAll();
   scheduleList.innerHTML = '';
   for (const s of schedules) {
-    scheduleList.appendChild(listItem(s.domain, `${daysSummary(s.days)} · ${s.start}–${s.end}`,
-      () => removeSchedule(s.id)));
+    const domains = s.domains || (s.domain ? [s.domain] : []);
+    scheduleList.appendChild(listItem(
+      domains.join(', '),
+      `${daysSummary(s.days)} · ${s.start}–${s.end}`,
+      () => removeSchedule(s.id)
+    ));
   }
 }
 
 document.getElementById('addSchedule').addEventListener('click', async () => {
-  const domain = FL.normalizeDomain(schedDomain.value);
-  if (!domain || !pickedDays.length) { schedDomain.focus(); return; }
+  addSchedSite(); // fold in anything still typed
+  if (!schedSites.length || !pickedDays.length) { schedDomain.focus(); return; }
   const { schedules } = await FL.getAll();
   schedules.push({
-    id: FL.uid(), domain, label: domain,
+    id: FL.uid(),
+    label: schedSites.join(', '),
+    domains: [...schedSites],
     days: [...pickedDays].sort((a, b) => a - b),
-    start: schedStart.value || '09:00', end: schedEnd.value || '17:00'
+    start: schedStart.value || '09:00',
+    end: schedEnd.value || '17:00'
   });
   await FL.set({ schedules });
-  schedDomain.value = '';
-  renderSchedules(); flashSaved();
+  schedSites = [];
+  renderSchedChips();
+  renderSchedules();
+  flashSaved();
 });
 
 async function removeSchedule(id) {
   const { schedules } = await FL.getAll();
   await FL.set({ schedules: schedules.filter(s => s.id !== id) });
   renderSchedules();
-}
-
-// ==================================================================== PRESETS
-const presetList = document.getElementById('presetList');
-const presetName = document.getElementById('presetName');
-const presetDomains = document.getElementById('presetDomains');
-
-async function renderPresets() {
-  const { presets } = await FL.getAll();
-  presetList.innerHTML = '';
-  for (const p of presets) {
-    presetList.appendChild(listItem(p.name, p.domains.join(', '), () => removePreset(p.id)));
-  }
-}
-
-document.getElementById('addPreset').addEventListener('click', async () => {
-  const name = presetName.value.trim();
-  const domains = presetDomains.value.split(/[,\s]+/).map(FL.normalizeDomain).filter(Boolean);
-  if (!name || !domains.length) { presetName.focus(); return; }
-  const { presets } = await FL.getAll();
-  presets.push({ id: FL.uid(), name, domains: [...new Set(domains)] });
-  await FL.set({ presets });
-  presetName.value = ''; presetDomains.value = '';
-  renderPresets(); flashSaved();
-});
-
-async function removePreset(id) {
-  const { presets } = await FL.getAll();
-  await FL.set({ presets: presets.filter(p => p.id !== id) });
-  renderPresets();
 }
 
 // ================================================================ APPEARANCE
@@ -162,7 +219,6 @@ const hardened = document.getElementById('hardened');
 const challengeEnabled = document.getElementById('challengeEnabled');
 const captchaRounds = document.getElementById('captchaRounds');
 const phraseNote = document.getElementById('phraseNote');
-
 document.getElementById('phraseText').textContent = FL.COMMITMENT_PHRASE;
 
 async function loadSettings() {
@@ -213,6 +269,8 @@ function listItem(title, sub, onRemove) {
 // ==================================================================== init
 renderStats();
 renderDayPicker();
+renderSchedGroups();
+renderSchedChips();
 renderSchedules();
 renderPresets();
 loadSettings();

@@ -143,10 +143,12 @@ async function renderActive() {
     }
   }
   for (const s of state.schedules) {
-    if (FL.scheduleActive(s, now)) {
-      const u = state.scheduleUnlocks[s.id];
-      items.push({ kind: 'schedule', id: s.id, domain: s.domain,
-        endTime: FL.scheduleWindowEnd(s, now), unlocked: !!(u && u > now) });
+    if (!FL.scheduleActive(s, now)) continue;
+    const u = state.scheduleUnlocks[s.id];
+    const unlocked = !!(u && u > now);
+    for (const d of (s.domains || [])) {
+      items.push({ kind: 'schedule', id: s.id, domain: d,
+        endTime: FL.scheduleWindowEnd(s, now), unlocked });
     }
   }
 
