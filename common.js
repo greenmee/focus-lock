@@ -6,7 +6,7 @@
 (function (global) {
   'use strict';
 
-  // Typed exactly to undo a lock / pause / break through when Hardened mode is on.
+  // Typed exactly to end a lock early or break through when Hardened mode is on.
   const COMMITMENT_PHRASE = 'I am choosing to break my own focus';
 
   const DEFAULTS = {
@@ -14,11 +14,10 @@
     schedules: [],         // [{ id, domain, label, days:[0-6], start:"HH:MM", end:"HH:MM" }]
     scheduleUnlocks: {},    // { [scheduleId]: timestampMs }
     presets: [],           // [{ id, name, domains:[] }]
-    pause: { until: 0 },    // global pause: all blocking suspended while until > now
     settings: {
       captchaRounds: 5,
       challengeEnabled: true,
-      hardened: false,         // commitment-phrase required to undo / pause / break through
+      hardened: false,         // commitment-phrase required to end early / break through
       theme: 'auto'            // 'auto' | 'light' | 'dark'
     },
     stats: {
@@ -41,7 +40,6 @@
     const raw = await chrome.storage.local.get(DEFAULTS);
     raw.settings = Object.assign({}, DEFAULTS.settings, raw.settings);
     raw.stats = Object.assign({}, DEFAULTS.stats, raw.stats);
-    raw.pause = Object.assign({}, DEFAULTS.pause, raw.pause);
     return raw;
   }
   function set(partial) {
@@ -114,9 +112,6 @@
   async function evaluate(url, state, now) {
     if (!state) state = await getAll();
     if (typeof now !== 'number') now = Date.now();
-
-    // Global pause beats everything.
-    if (state.pause && state.pause.until > now) return null;
 
     const host = getHost(url);
     if (!host) return null;

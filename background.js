@@ -54,11 +54,6 @@ async function refreshBadge() {
   try {
     const state = await FL.getAll();
     const now = Date.now();
-    if (state.pause && state.pause.until > now) {
-      await chrome.action.setBadgeBackgroundColor({ color: '#9DACA3' });
-      await chrome.action.setBadgeText({ text: '||' });
-      return;
-    }
     let count = 0;
     for (const b of state.blocks) {
       if (b.endTime > now && !(b.unlockedUntil && b.unlockedUntil > now)) count++;

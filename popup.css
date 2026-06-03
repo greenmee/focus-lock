@@ -26,13 +26,6 @@ h1 { font-size: 17px; margin: 0; letter-spacing: -.01em; }
 h2 { font-size: 14px; margin: 0 0 4px; }
 .hint { font-size: 12px; margin: 0 0 12px; }
 
-/* pause card */
-.pause-card { padding: 14px 16px; }
-.pause-head { display: flex; flex-direction: column; margin-bottom: 10px; }
-.pause-head strong { font-size: 13.5px; }
-.pause-head span { font-size: 11.5px; }
-#resumeBtn { margin-top: 4px; }
-
 /* presets */
 .preset-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
 .preset-row:empty { display: none; }

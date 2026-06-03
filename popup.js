@@ -10,12 +10,6 @@ const startBtn = document.getElementById('startBtn');
 const activeCard = document.getElementById('activeCard');
 const activeList = document.getElementById('activeList');
 
-const pauseIdle = document.getElementById('pauseIdle');
-const pauseActive = document.getElementById('pauseActive');
-const pausePresets = document.getElementById('pausePresets');
-const pauseCountdown = document.getElementById('pauseCountdown');
-const resumeBtn = document.getElementById('resumeBtn');
-
 let sites = [];
 let durationMin = 0;
 
@@ -49,19 +43,6 @@ function requireCommitment(why) {
     commitOk.onclick = () => { if (commitInput.value.trim() === FL.COMMITMENT_PHRASE) { cleanup(); resolve(true); } };
     commitCancel.onclick = () => { cleanup(); resolve(false); };
   });
-}
-
-async function hasActiveLocks(state, now) {
-  for (const b of state.blocks) {
-    if (b.endTime > now && !(b.unlockedUntil && b.unlockedUntil > now)) return true;
-  }
-  for (const s of state.schedules) {
-    if (FL.scheduleActive(s, now)) {
-      const u = state.scheduleUnlocks[s.id];
-      if (!(u && u > now)) return true;
-    }
-  }
-  return false;
 }
 
 // ---------------------------------------------------------------- presets
@@ -148,34 +129,6 @@ startBtn.addEventListener('click', async () => {
   [...presetsEl.children].forEach(b => b.classList.remove('sel'));
   renderChips(); syncStart(); renderActive();
 });
-
-// ---------------------------------------------------------------- pause
-pausePresets.addEventListener('click', async e => {
-  const btn = e.target.closest('.chip-btn');
-  if (!btn) return;
-  const mins = Number(btn.dataset.min);
-  const state = await FL.getAll();
-  const now = Date.now();
-  if (state.settings.hardened && await hasActiveLocks(state, now)) {
-    const ok = await requireCommitment('Hardened mode is on. Pausing lifts your active locks — type the phrase to confirm.');
-    if (!ok) return;
-  }
-  await FL.set({ pause: { until: now + mins * 60000 } });
-  renderPause();
-});
-
-resumeBtn.addEventListener('click', async () => {
-  await FL.set({ pause: { until: 0 } }); // resuming protection early is always allowed
-  renderPause();
-});
-
-async function renderPause() {
-  const { pause } = await FL.getAll();
-  const active = pause.until > Date.now();
-  pauseIdle.hidden = active;
-  pauseActive.hidden = !active;
-  if (active) pauseActive.dataset.until = String(pause.until);
-}
 
 // ---------------------------------------------------------------- active list
 async function renderActive() {
@@ -265,11 +218,6 @@ setInterval(() => {
     if (left <= 0) stale = true;
     el.textContent = FL.formatRemaining(left);
   });
-  if (!pauseActive.hidden) {
-    const left = Number(pauseActive.dataset.until) - now;
-    if (left <= 0) renderPause();
-    else pauseCountdown.textContent = FL.formatRemaining(left);
-  }
   if (stale) renderActive();
 }, 1000);
 
@@ -282,4 +230,3 @@ renderPresets();
 renderChips();
 syncStart();
 renderActive();
-renderPause();
