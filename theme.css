@@ -50,6 +50,11 @@
 
 * { box-sizing: border-box; }
 
+/* The `hidden` attribute must always win, even over component rules that set an
+ * explicit display (e.g. the modal's `display: grid`). Without this, hidden
+ * overlays show on load. */
+[hidden] { display: none !important; }
+
 body {
   margin: 0;
   font-family: var(--font);
