@@ -1,0 +1,68 @@
+/* theme.css — calm & minimal design tokens, shared by every page. */
+:root {
+  --paper:      #F6F5F0;  /* warm off-white background          */
+  --surface:    #FFFFFF;  /* cards                              */
+  --ink:        #2C3A33;  /* primary text (deep sage-charcoal)  */
+  --ink-soft:   #6B7A72;  /* secondary text                     */
+  --sage:       #6B9080;  /* primary accent                     */
+  --sage-deep:  #557766;  /* hover / pressed                    */
+  --sage-tint:  #E6EFEA;  /* soft fills                         */
+  --line:       #E4E6E1;  /* hairline borders                   */
+  --danger:     #B07A6E;  /* muted clay, never alarming red     */
+  --radius:     16px;
+  --radius-sm:  10px;
+  --shadow:     0 1px 2px rgba(44,58,51,.04), 0 8px 24px rgba(44,58,51,.06);
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  transition: background .15s ease, transform .05s ease, color .15s ease;
+}
+button:active { transform: translateY(1px); }
+
+.btn-primary {
+  background: var(--sage);
+  color: #fff;
+  padding: 11px 18px;
+  font-weight: 600;
+}
+.btn-primary:hover { background: var(--sage-deep); }
+.btn-primary:disabled { background: #C2CCC6; cursor: default; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink-soft);
+  padding: 8px 12px;
+}
+.btn-ghost:hover { background: var(--sage-tint); color: var(--ink); }
+
+input[type="text"], input[type="time"], input[type="number"], select {
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  outline: none;
+}
+input:focus, select:focus { border-color: var(--sage); }
+
+a { color: var(--sage-deep); }
+
+.muted { color: var(--ink-soft); }

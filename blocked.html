@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Locked — Focus Lock</title>
+  <link rel="stylesheet" href="theme.css" />
+  <link rel="stylesheet" href="blocked.css" />
+</head>
+<body>
+  <main class="stage">
+
+    <!-- LOCK VIEW -->
+    <section id="lockView" class="panel">
+      <div class="badge" aria-hidden="true"></div>
+      <p class="eyebrow">This site is in your focus box</p>
+      <h1 id="domainName">this site</h1>
+
+      <div class="timer">
+        <span class="timer-label">unlocks in</span>
+        <div id="countdown" class="countdown">--:--</div>
+      </div>
+
+      <p id="encourage" class="encourage"></p>
+
+      <button id="needIn" class="btn-ghost need-link">I really need to visit →</button>
+    </section>
+
+    <!-- CHALLENGE VIEW -->
+    <section id="challengeView" class="panel" hidden>
+      <p class="eyebrow">Are you sure it's worth it?</p>
+      <h2 class="challenge-title">Type each code to continue</h2>
+      <div class="progress">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+      <p id="progressText" class="progress-text muted"></p>
+
+      <div id="captchaBox" class="captcha"></div>
+      <input id="captchaInput" type="text" autocomplete="off" autocapitalize="off"
+             spellcheck="false" placeholder="type the code above" />
+      <p id="captchaError" class="captcha-error" hidden>Not quite — try that one again.</p>
+
+      <button id="giveUp" class="btn-ghost need-link">Never mind, keep me focused</button>
+    </section>
+
+    <!-- CONFIRM VIEW -->
+    <section id="confirmView" class="panel" hidden>
+      <div class="badge soft" aria-hidden="true"></div>
+      <h2 class="confirm-title">Are you sure?</h2>
+      <p class="confirm-body">
+        You set this limit for a reason. Unlocking opens
+        <strong id="confirmDomain">this site</strong> for the rest of your session.
+      </p>
+      <div class="confirm-actions">
+        <button id="confirmNo" class="btn-primary">No — keep me focused</button>
+        <button id="confirmYes" class="btn-ghost danger-link">Yes, unlock it</button>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="common.js"></script>
+  <script src="blocked.js"></script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Focus Lock — Settings</title>
+  <link rel="stylesheet" href="theme.css" />
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="head">
+      <div class="logo" aria-hidden="true"></div>
+      <div>
+        <h1>Focus Lock</h1>
+        <p class="muted">Recurring schedules &amp; settings</p>
+      </div>
+    </header>
+
+    <section class="card">
+      <h2>Recurring schedules</h2>
+      <p class="muted hint">
+        Automatically lock a site on the days and hours you choose — e.g. block
+        YouTube every weekday, 9:00 to 17:00.
+      </p>
+
+      <ul id="scheduleList" class="sched-list"></ul>
+
+      <div class="sched-form">
+        <input id="schedDomain" type="text" placeholder="site, e.g. reddit.com" />
+        <div class="days" id="days"></div>
+        <div class="time-row">
+          <label>From <input id="schedStart" type="time" value="09:00" /></label>
+          <label>to <input id="schedEnd" type="time" value="17:00" /></label>
+          <button id="addSchedule" class="btn-primary">Add schedule</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>The challenge escape</h2>
+      <p class="muted hint">
+        When a site is locked, visitors can choose to “really need in.” That opens a
+        deliberately tedious captcha gauntlet, then a final “are you sure?”.
+      </p>
+
+      <label class="setting-row">
+        <span>
+          <strong>Allow the challenge escape</strong>
+          <span class="muted sub">Turn off to make locks a hard wall until the timer ends.</span>
+        </span>
+        <input id="challengeEnabled" type="checkbox" />
+      </label>
+
+      <label class="setting-row">
+        <span>
+          <strong>Captcha repetitions</strong>
+          <span class="muted sub">How many codes to solve before the unlock confirmation.</span>
+        </span>
+        <input id="captchaRounds" type="number" min="1" max="50" />
+      </label>
+    </section>
+
+    <p class="saved muted" id="savedNote" hidden>Saved ✓</p>
+  </div>
+
+  <script src="common.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

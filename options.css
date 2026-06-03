@@ -1,0 +1,69 @@
+.page { max-width: 680px; margin: 0 auto; padding: 40px 24px 80px; }
+
+.head { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+.logo {
+  width: 44px; height: 44px; border-radius: 13px; background: var(--sage);
+  position: relative; flex: none;
+}
+.logo::before, .logo::after {
+  content: ""; position: absolute; top: 13px; width: 6px; height: 18px;
+  background: #fff; border-radius: 2px;
+}
+.logo::before { left: 15px; }
+.logo::after  { right: 15px; }
+h1 { font-size: 22px; margin: 0; }
+.head p { margin: 2px 0 0; font-size: 13px; }
+
+.card {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+h2 { font-size: 16px; margin: 0 0 6px; }
+.hint { font-size: 13px; margin: 0 0 18px; line-height: 1.5; }
+
+/* schedule list */
+.sched-list { list-style: none; margin: 0 0 18px; padding: 0; }
+.sched-list:empty { display: none; }
+.sched-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 0; border-top: 1px solid var(--line);
+}
+.sched-item:first-child { border-top: none; }
+.sched-info { display: flex; flex-direction: column; gap: 3px; }
+.sched-domain { font-weight: 600; font-size: 14.5px; }
+.sched-when { font-size: 12.5px; color: var(--ink-soft); }
+.remove-btn { font-size: 12.5px; color: var(--danger); }
+.remove-btn:hover { background: rgba(176,122,110,.12); }
+
+/* schedule form */
+.sched-form {
+  border-top: 1px dashed var(--line); padding-top: 18px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+#schedDomain { width: 100%; }
+
+.days { display: flex; gap: 6px; flex-wrap: wrap; }
+.day-btn {
+  width: 42px; padding: 8px 0; text-align: center;
+  background: var(--surface); border: 1px solid var(--line);
+  color: var(--ink); font-weight: 600; font-size: 12.5px;
+}
+.day-btn:hover { border-color: var(--sage); }
+.day-btn.sel { background: var(--sage); border-color: var(--sage); color: #fff; }
+
+.time-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.time-row label { font-size: 13px; color: var(--ink-soft); display: inline-flex; align-items: center; gap: 6px; }
+.time-row .btn-primary { margin-left: auto; }
+
+/* settings rows */
+.setting-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  padding: 14px 0; border-top: 1px solid var(--line); cursor: pointer;
+}
+.setting-row:first-of-type { border-top: none; }
+.setting-row .sub { display: block; font-size: 12.5px; margin-top: 2px; font-weight: 400; }
+.setting-row input[type="number"] { width: 80px; }
+.setting-row input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--sage); }
+
+.saved { text-align: center; font-size: 13px; transition: opacity .3s; }
