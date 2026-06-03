@@ -142,37 +142,6 @@ async function removePreset(id) {
   renderPresets();
 }
 
-// =========================================================== CUSTOM MESSAGES
-const messageList = document.getElementById('messageList');
-const msgDomain = document.getElementById('msgDomain');
-const msgText = document.getElementById('msgText');
-
-async function renderMessages() {
-  const { domainMessages } = await FL.getAll();
-  messageList.innerHTML = '';
-  for (const [domain, text] of Object.entries(domainMessages)) {
-    messageList.appendChild(listItem(domain, text, () => removeMessage(domain)));
-  }
-}
-
-document.getElementById('addMessage').addEventListener('click', async () => {
-  const domain = FL.normalizeDomain(msgDomain.value);
-  const text = msgText.value.trim();
-  if (!domain || !text) { msgDomain.focus(); return; }
-  const { domainMessages } = await FL.getAll();
-  domainMessages[domain] = text;
-  await FL.set({ domainMessages });
-  msgDomain.value = ''; msgText.value = '';
-  renderMessages(); flashSaved();
-});
-
-async function removeMessage(domain) {
-  const { domainMessages } = await FL.getAll();
-  delete domainMessages[domain];
-  await FL.set({ domainMessages });
-  renderMessages();
-}
-
 // ================================================================ APPEARANCE
 const themeSeg = document.getElementById('themeSeg');
 themeSeg.addEventListener('click', async e => {
@@ -246,5 +215,4 @@ renderStats();
 renderDayPicker();
 renderSchedules();
 renderPresets();
-renderMessages();
 loadSettings();

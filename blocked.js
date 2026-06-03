@@ -55,12 +55,11 @@ const SENTENCES = [
 
 // ---- load settings + per-domain message ---------------------------------
 (async function init() {
-  const { settings, domainMessages } = await FL.getAll();
+  const { settings } = await FL.getAll();
   hardened = !!settings.hardened;
   rounds = settings.captchaRounds || 5;
   challengeEnabled = settings.challengeEnabled !== false;
-  const custom = domainMessages && domainMessages[domain];
-  encourageEl.textContent = custom || ENCOURAGEMENTS[Math.floor(Math.random() * ENCOURAGEMENTS.length)];
+  encourageEl.textContent = ENCOURAGEMENTS[Math.floor(Math.random() * ENCOURAGEMENTS.length)];
 })();
 
 // ---- countdown ----------------------------------------------------------

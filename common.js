@@ -14,7 +14,6 @@
     schedules: [],         // [{ id, domain, label, days:[0-6], start:"HH:MM", end:"HH:MM" }]
     scheduleUnlocks: {},    // { [scheduleId]: timestampMs }
     presets: [],           // [{ id, name, domains:[] }]
-    domainMessages: {},     // { [domain]: "custom motivation shown on the lock screen" }
     pause: { until: 0 },    // global pause: all blocking suspended while until > now
     settings: {
       captchaRounds: 5,
