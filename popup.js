@@ -30,9 +30,7 @@ function requireCommitment(why) {
     commitModal.hidden = false;
     commitInput.focus();
 
-    const onInput = () => {
-      commitOk.disabled = commitInput.value.trim() !== FL.COMMITMENT_PHRASE;
-    };
+    const onInput = () => { commitOk.disabled = commitInput.value.trim() !== FL.COMMITMENT_PHRASE; };
     const cleanup = () => {
       commitModal.hidden = true;
       commitInput.removeEventListener('input', onInput);
@@ -136,19 +134,19 @@ async function renderActive() {
   const now = Date.now();
   const items = [];
 
+  // Sessions — skip any that have been unlocked.
   for (const b of state.blocks) {
-    if (b.endTime > now) {
-      items.push({ kind: 'session', id: b.id, domain: b.domain, endTime: b.endTime,
-        unlocked: b.unlockedUntil && b.unlockedUntil > now });
+    if (b.endTime > now && !(b.unlockedUntil && b.unlockedUntil > now)) {
+      items.push({ kind: 'session', id: b.id, domain: b.domain, endTime: b.endTime });
     }
   }
+  // Schedules — one row per still-locked domain; skip unlocked schedules.
   for (const s of state.schedules) {
     if (!FL.scheduleActive(s, now)) continue;
     const u = state.scheduleUnlocks[s.id];
-    const unlocked = !!(u && u > now);
+    if (u && u > now) continue; // unlocked → drop
     for (const d of (s.domains || [])) {
-      items.push({ kind: 'schedule', id: s.id, domain: d,
-        endTime: FL.scheduleWindowEnd(s, now), unlocked });
+      items.push({ kind: 'schedule', id: s.id, domain: d, endTime: FL.scheduleWindowEnd(s, now) });
     }
   }
 
@@ -172,10 +170,7 @@ async function renderActive() {
       tag.textContent = 'scheduled';
       dom.appendChild(tag);
     }
-    const sub = document.createElement('span');
-    sub.className = 'active-sub muted';
-    sub.textContent = it.unlocked ? 'unlocked for this session' : 'locked';
-    meta.append(dom, sub);
+    meta.appendChild(dom);
 
     const right = document.createElement('div');
     right.style.cssText = 'display:flex;align-items:center;gap:10px';
