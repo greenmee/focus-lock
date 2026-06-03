@@ -53,4 +53,5 @@ If this policy ever changes, the updated version will be posted here with a new
 
 ## Contact
 
-Questions? Open an issue on the project's GitHub repository.
+Questions or feedback? Email **toscamee@gmail.com** or open an issue on the
+project's GitHub repository.

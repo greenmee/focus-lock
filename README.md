@@ -76,6 +76,8 @@ browser. See [`PRIVACY.md`](./PRIVACY.md) for the full policy.
 If Focus Lock helps you stay focused, you can support development on
 [Ko-fi](https://ko-fi.com/toscame). Totally optional — the extension is free.
 
+Feedback or bugs? Email **toscamee@gmail.com** or open a GitHub issue.
+
 ## License
 
 MIT — do what you like.
