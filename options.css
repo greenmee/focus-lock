@@ -121,3 +121,7 @@ h2 { font-size: 16px; margin: 0 0 6px; }
 .segmented button.sel { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
 
 .saved { text-align: center; font-size: 13px; transition: opacity .3s; }
+
+.opt-foot { text-align: center; margin-top: 10px; }
+.opt-foot a { font-size: 13px; font-weight: 600; text-decoration: none; color: var(--sage-deep); }
+.opt-foot a:hover { text-decoration: underline; }
