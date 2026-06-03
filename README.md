@@ -27,11 +27,10 @@ productive choice wins by default.
 - **Varied challenges** — each escape round is a random captcha, math problem,
   type-this-sentence, or forced wait, so you can't autopilot through it. The
   "is it worth it?" message changes after every round you solve.
-- **Hardened mode** (opt-in) — ending a lock, pausing, or breaking through all require
-  typing a commitment phrase first. Off by default; locks stay an honest speed bump.
-- **Block-list groups** — save bundles like "Social" and lock the whole set in one tap.
-- **Custom lock messages** — show your own motivation per site.
-- **Pause** — lift all blocking for 15/30/60 minutes when you genuinely need to.
+- **Hardened mode** (opt-in) — ending a lock or breaking through requires typing a
+  commitment phrase first. Off by default; locks stay an honest speed bump.
+- **Block-list groups** — save bundles like "Social" and lock the whole set in one tap,
+  in a quick session or a recurring schedule.
 - **Stats & streaks** — focus committed, blocks enforced, times you resisted, and a
   daily streak, on the settings page.
 - **Dark mode** — auto (follows your system), or force light/dark.
