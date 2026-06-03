@@ -66,6 +66,16 @@ See [`CLAUDE.md`](./CLAUDE.md) for the full architecture, data model, and conven
 | Settings & schedules | `options.{html,css,js}` |
 | Icons | `icons/` |
 
+## Privacy
+
+Focus Lock collects nothing and sends nothing — all data stays local in your
+browser. See [`PRIVACY.md`](./PRIVACY.md) for the full policy.
+
+## Support
+
+If Focus Lock helps you stay focused, you can support development on
+[Ko-fi](https://ko-fi.com/toscame). Totally optional — the extension is free.
+
 ## License
 
 MIT — do what you like.
