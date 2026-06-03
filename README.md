@@ -19,7 +19,22 @@ productive choice wins by default.
    solving a deliberately tedious captcha several times, then confirming "yes, I'm sure."
    Say no and you're back to your countdown. The friction is the feature.
 4. **Recurring schedules.** On the settings page you can auto-lock a site on a routine,
-   e.g. block Reddit every weekday from 9:00 to 17:00.
+   e.g. block Reddit every weekday from 9:00 to 17:00 — overnight windows included.
+
+## Features
+
+- **Two timer types** — quick one-off focus sessions and recurring schedules.
+- **Varied challenges** — each escape round is a random captcha, math problem,
+  type-this-sentence, or forced wait, so you can't autopilot through it. The
+  "is it worth it?" message changes after every round you solve.
+- **Hardened mode** (opt-in) — ending a lock, pausing, or breaking through all require
+  typing a commitment phrase first. Off by default; locks stay an honest speed bump.
+- **Block-list groups** — save bundles like "Social" and lock the whole set in one tap.
+- **Custom lock messages** — show your own motivation per site.
+- **Pause** — lift all blocking for 15/30/60 minutes when you genuinely need to.
+- **Stats & streaks** — focus committed, blocks enforced, times you resisted, and a
+  daily streak, on the settings page.
+- **Dark mode** — auto (follows your system), or force light/dark.
 
 ## Install (load unpacked)
 

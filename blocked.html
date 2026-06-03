@@ -27,17 +27,13 @@
 
     <!-- CHALLENGE VIEW -->
     <section id="challengeView" class="panel" hidden>
-      <p class="eyebrow">Are you sure it's worth it?</p>
-      <h2 class="challenge-title">Type each code to continue</h2>
-      <div class="progress">
-        <div id="progressBar" class="progress-bar"></div>
-      </div>
+      <p class="eyebrow" id="challengeEyebrow">Are you sure it's worth it?</p>
+      <h2 class="challenge-title" id="challengeTitle">Prove you mean it</h2>
+      <div class="progress"><div id="progressBar" class="progress-bar"></div></div>
       <p id="progressText" class="progress-text muted"></p>
 
-      <div id="captchaBox" class="captcha"></div>
-      <input id="captchaInput" type="text" autocomplete="off" autocapitalize="off"
-             spellcheck="false" placeholder="type the code above" />
-      <p id="captchaError" class="captcha-error" hidden>Not quite — try that one again.</p>
+      <div id="challengeBody"></div>
+      <p id="challengeError" class="captcha-error" hidden>Not quite — try again.</p>
 
       <button id="giveUp" class="btn-ghost need-link">Never mind, keep me focused</button>
     </section>
@@ -45,14 +41,26 @@
     <!-- CONFIRM VIEW -->
     <section id="confirmView" class="panel" hidden>
       <div class="badge soft" aria-hidden="true"></div>
-      <h2 class="confirm-title">Are you sure?</h2>
+      <h2 class="confirm-title">Last chance — are you sure?</h2>
       <p class="confirm-body">
         You set this limit for a reason. Unlocking opens
         <strong id="confirmDomain">this site</strong> for the rest of your session.
       </p>
-      <div class="confirm-actions">
+
+      <!-- soft mode: yes/no -->
+      <div id="confirmSoft" class="confirm-actions">
         <button id="confirmNo" class="btn-primary">No — keep me focused</button>
         <button id="confirmYes" class="btn-ghost danger-link">Yes, unlock it</button>
+      </div>
+
+      <!-- hardened mode: type the commitment phrase -->
+      <div id="confirmHard" hidden>
+        <p class="commit-phrase" id="confirmPhrase"></p>
+        <input id="confirmCommit" type="text" autocomplete="off" placeholder="type the phrase exactly" />
+        <div class="confirm-actions">
+          <button id="confirmNoHard" class="btn-primary">No — keep me focused</button>
+          <button id="confirmYesHard" class="btn-ghost danger-link" disabled>Unlock</button>
+        </div>
       </div>
     </section>
 

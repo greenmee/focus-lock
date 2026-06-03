@@ -27,8 +27,7 @@ html, body { height: 100%; }
 
 .badge {
   width: 64px; height: 64px; border-radius: 20px;
-  background: var(--sage); margin: 0 auto 20px;
-  position: relative;
+  background: var(--sage); margin: 0 auto 20px; position: relative;
 }
 .badge::before, .badge::after {
   content: ""; position: absolute; top: 19px; width: 8px; height: 26px;
@@ -42,16 +41,11 @@ html, body { height: 100%; }
 .eyebrow {
   text-transform: uppercase; letter-spacing: .08em; font-size: 12px;
   font-weight: 600; color: var(--sage-deep); margin: 0 0 6px;
+  min-height: 1.2em; transition: opacity .2s ease;
 }
-h1 {
-  font-size: 30px; margin: 0 0 22px; letter-spacing: -.02em;
-  word-break: break-all;
-}
+h1 { font-size: 30px; margin: 0 0 22px; letter-spacing: -.02em; word-break: break-all; }
 
-.timer {
-  background: var(--sage-tint); border-radius: 18px;
-  padding: 18px; margin-bottom: 22px;
-}
+.timer { background: var(--sage-tint); border-radius: 18px; padding: 18px; margin-bottom: 22px; }
 .timer-label {
   display: block; font-size: 12px; text-transform: uppercase;
   letter-spacing: .06em; color: var(--sage-deep); margin-bottom: 4px;
@@ -63,47 +57,52 @@ h1 {
 
 .encourage { font-size: 15px; color: var(--ink-soft); margin: 0 0 26px; line-height: 1.5; }
 
-.need-link {
-  font-size: 13px; color: var(--ink-soft);
-}
+.need-link { font-size: 13px; color: var(--ink-soft); }
 .need-link:hover { color: var(--ink); background: var(--sage-tint); }
 
 /* ---- challenge ---- */
 .challenge-title { font-size: 22px; margin: 0 0 18px; letter-spacing: -.01em; }
-
-.progress {
-  height: 8px; background: var(--line); border-radius: 999px;
-  overflow: hidden; margin-bottom: 8px;
-}
-.progress-bar {
-  height: 100%; width: 0%; background: var(--sage);
-  border-radius: 999px; transition: width .3s ease;
-}
+.progress { height: 8px; background: var(--line); border-radius: 999px; overflow: hidden; margin-bottom: 8px; }
+.progress-bar { height: 100%; width: 0%; background: var(--sage); border-radius: 999px; transition: width .3s ease; }
 .progress-text { font-size: 12px; margin: 0 0 22px; }
 
 .captcha {
   user-select: none;
   background:
-    repeating-linear-gradient(135deg, rgba(44,58,51,.05) 0 2px, transparent 2px 7px),
-    #EFEEE7;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 22px 16px;
-  margin-bottom: 14px;
-  font-size: 40px;
-  font-weight: 800;
-  letter-spacing: .35em;
-  color: #3A463F;
-  text-indent: .35em; /* balance the trailing letter-spacing */
+    repeating-linear-gradient(135deg, rgba(120,120,120,.10) 0 2px, transparent 2px 7px),
+    var(--captcha-bg);
+  border: 1px solid var(--line); border-radius: 14px;
+  padding: 22px 16px; margin-bottom: 14px;
+  font-size: 40px; font-weight: 800; letter-spacing: .35em;
+  color: var(--ink); text-indent: .35em;
 }
 .captcha span { display: inline-block; }
 
-#captchaInput {
+.math-q {
+  font-size: 34px; font-weight: 800; color: var(--ink);
+  background: var(--captcha-bg); border: 1px solid var(--line);
+  border-radius: 14px; padding: 20px; margin-bottom: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.sentence-q {
+  font-size: 18px; font-weight: 600; color: var(--ink); line-height: 1.5;
+  background: var(--captcha-bg); border: 1px solid var(--line);
+  border-radius: 14px; padding: 18px; margin-bottom: 14px; user-select: none;
+}
+.wait-num {
+  font-size: 56px; font-weight: 800; color: var(--sage-deep);
+  font-variant-numeric: tabular-nums; margin-bottom: 16px;
+}
+.wait-btn { margin-bottom: 4px; }
+
+.challenge-input {
   width: 100%; text-align: center; font-size: 22px;
-  letter-spacing: .25em; text-transform: uppercase;
   padding: 14px; margin-bottom: 10px;
 }
+.captcha + .challenge-input { letter-spacing: .25em; text-transform: uppercase; }
 .captcha-error { color: var(--danger); font-size: 13px; margin: 0 0 14px; }
+
+.block { width: 100%; }
 
 /* ---- confirm ---- */
 .confirm-title { font-size: 26px; margin: 0 0 12px; letter-spacing: -.01em; }
@@ -112,3 +111,11 @@ h1 {
 .confirm-actions .btn-primary { width: 100%; }
 .danger-link { color: var(--danger); }
 .danger-link:hover { background: rgba(176,122,110,.12); color: var(--danger); }
+.danger-link:disabled { color: var(--ink-soft); background: transparent; cursor: default; }
+
+.commit-phrase {
+  font-weight: 700; color: var(--ink); background: var(--sage-tint);
+  border-radius: var(--radius-sm); padding: 12px 14px; font-size: 14px;
+  margin: 0 0 12px; user-select: none;
+}
+#confirmCommit { width: 100%; text-align: center; padding: 14px; margin-bottom: 14px; font-size: 15px; }

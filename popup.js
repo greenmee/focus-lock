@@ -3,17 +3,86 @@ const FL = self.FocusLock;
 
 const siteInput = document.getElementById('siteInput');
 const chipsEl = document.getElementById('chips');
+const presetRow = document.getElementById('presetRow');
 const presetsEl = document.getElementById('presets');
 const customHours = document.getElementById('customHours');
 const startBtn = document.getElementById('startBtn');
 const activeCard = document.getElementById('activeCard');
 const activeList = document.getElementById('activeList');
 
-let sites = [];          // staged domains for the new session
-let durationMin = 0;     // chosen duration in minutes
-let tickTimer = null;
+const pauseIdle = document.getElementById('pauseIdle');
+const pauseActive = document.getElementById('pauseActive');
+const pausePresets = document.getElementById('pausePresets');
+const pauseCountdown = document.getElementById('pauseCountdown');
+const resumeBtn = document.getElementById('resumeBtn');
 
-// ---- staging the site list ----------------------------------------------
+let sites = [];
+let durationMin = 0;
+
+// ---------------------------------------------------------------- commitment
+const commitModal = document.getElementById('commitModal');
+const commitWhy = document.getElementById('commitWhy');
+const commitPhrase = document.getElementById('commitPhrase');
+const commitInput = document.getElementById('commitInput');
+const commitOk = document.getElementById('commitOk');
+const commitCancel = document.getElementById('commitCancel');
+
+function requireCommitment(why) {
+  return new Promise(resolve => {
+    commitWhy.textContent = why;
+    commitPhrase.textContent = FL.COMMITMENT_PHRASE;
+    commitInput.value = '';
+    commitOk.disabled = true;
+    commitModal.hidden = false;
+    commitInput.focus();
+
+    const onInput = () => {
+      commitOk.disabled = commitInput.value.trim() !== FL.COMMITMENT_PHRASE;
+    };
+    const cleanup = () => {
+      commitModal.hidden = true;
+      commitInput.removeEventListener('input', onInput);
+      commitOk.onclick = null;
+      commitCancel.onclick = null;
+    };
+    commitInput.addEventListener('input', onInput);
+    commitOk.onclick = () => { if (commitInput.value.trim() === FL.COMMITMENT_PHRASE) { cleanup(); resolve(true); } };
+    commitCancel.onclick = () => { cleanup(); resolve(false); };
+  });
+}
+
+async function hasActiveLocks(state, now) {
+  for (const b of state.blocks) {
+    if (b.endTime > now && !(b.unlockedUntil && b.unlockedUntil > now)) return true;
+  }
+  for (const s of state.schedules) {
+    if (FL.scheduleActive(s, now)) {
+      const u = state.scheduleUnlocks[s.id];
+      if (!(u && u > now)) return true;
+    }
+  }
+  return false;
+}
+
+// ---------------------------------------------------------------- presets
+async function renderPresets() {
+  const { presets } = await FL.getAll();
+  presetRow.innerHTML = '';
+  for (const p of presets) {
+    if (!p.domains || !p.domains.length) continue;
+    const b = document.createElement('button');
+    b.className = 'preset-btn';
+    b.textContent = p.name;
+    b.title = p.domains.join(', ');
+    b.addEventListener('click', () => {
+      for (const d of p.domains) if (!sites.includes(d)) sites.push(d);
+      renderChips(); syncStart();
+    });
+    presetRow.appendChild(b);
+  }
+}
+
+// ---------------------------------------------------------------- staging
 function renderChips() {
   chipsEl.innerHTML = '';
   sites.forEach((d, i) => {
@@ -40,7 +109,7 @@ siteInput.addEventListener('keydown', e => {
 });
 siteInput.addEventListener('blur', addSite);
 
-// ---- duration -----------------------------------------------------------
+// ---------------------------------------------------------------- duration
 presetsEl.addEventListener('click', e => {
   const btn = e.target.closest('.chip-btn');
   if (!btn) return;
@@ -49,14 +118,12 @@ presetsEl.addEventListener('click', e => {
   [...presetsEl.children].forEach(b => b.classList.toggle('sel', b === btn));
   syncStart();
 });
-
 customHours.addEventListener('input', () => {
   [...presetsEl.children].forEach(b => b.classList.remove('sel'));
   const h = parseFloat(customHours.value);
   durationMin = isFinite(h) && h > 0 ? Math.round(h * 60) : 0;
   syncStart();
 });
-
 function syncStart() {
   const ready = sites.length > 0 && durationMin > 0;
   startBtn.disabled = !ready;
@@ -65,34 +132,52 @@ function syncStart() {
     : 'Lock for —';
 }
 
-// ---- start a session ----------------------------------------------------
+// ---------------------------------------------------------------- start
 startBtn.addEventListener('click', async () => {
   if (startBtn.disabled) return;
   const now = Date.now();
   const endTime = now + durationMin * 60000;
   const state = await FL.getAll();
   for (const domain of sites) {
-    state.blocks.push({
-      id: FL.uid(),
-      domain,
-      label: domain,
-      createdAt: now,
-      endTime,
-      unlockedUntil: 0
-    });
+    state.blocks.push({ id: FL.uid(), domain, label: domain, createdAt: now, endTime, unlockedUntil: 0 });
   }
   await FL.set({ blocks: state.blocks });
-  // reset staging
-  sites = [];
-  durationMin = 0;
-  customHours.value = '';
+  await FL.recordEvent({ sessions: 1, focusMin: durationMin, markFocusDay: true });
+
+  sites = []; durationMin = 0; customHours.value = '';
   [...presetsEl.children].forEach(b => b.classList.remove('sel'));
-  renderChips();
-  syncStart();
-  renderActive();
+  renderChips(); syncStart(); renderActive();
 });
 
-// ---- the "locked right now" list ----------------------------------------
+// ---------------------------------------------------------------- pause
+pausePresets.addEventListener('click', async e => {
+  const btn = e.target.closest('.chip-btn');
+  if (!btn) return;
+  const mins = Number(btn.dataset.min);
+  const state = await FL.getAll();
+  const now = Date.now();
+  if (state.settings.hardened && await hasActiveLocks(state, now)) {
+    const ok = await requireCommitment('Hardened mode is on. Pausing lifts your active locks — type the phrase to confirm.');
+    if (!ok) return;
+  }
+  await FL.set({ pause: { until: now + mins * 60000 } });
+  renderPause();
+});
+
+resumeBtn.addEventListener('click', async () => {
+  await FL.set({ pause: { until: 0 } }); // resuming protection early is always allowed
+  renderPause();
+});
+
+async function renderPause() {
+  const { pause } = await FL.getAll();
+  const active = pause.until > Date.now();
+  pauseIdle.hidden = active;
+  pauseActive.hidden = !active;
+  if (active) pauseActive.dataset.until = String(pause.until);
+}
+
+// ---------------------------------------------------------------- active list
 async function renderActive() {
   const state = await FL.getAll();
   const now = Date.now();
@@ -100,20 +185,15 @@ async function renderActive() {
 
   for (const b of state.blocks) {
     if (b.endTime > now) {
-      const unlocked = b.unlockedUntil && b.unlockedUntil > now;
-      items.push({
-        kind: 'session', id: b.id, domain: b.domain,
-        endTime: b.endTime, unlocked
-      });
+      items.push({ kind: 'session', id: b.id, domain: b.domain, endTime: b.endTime,
+        unlocked: b.unlockedUntil && b.unlockedUntil > now });
     }
   }
   for (const s of state.schedules) {
     if (FL.scheduleActive(s, now)) {
       const u = state.scheduleUnlocks[s.id];
-      items.push({
-        kind: 'schedule', id: s.id, domain: s.domain,
-        endTime: FL.scheduleWindowEnd(s, now), unlocked: !!(u && u > now)
-      });
+      items.push({ kind: 'schedule', id: s.id, domain: s.domain,
+        endTime: FL.scheduleWindowEnd(s, now), unlocked: !!(u && u > now) });
     }
   }
 
@@ -143,9 +223,7 @@ async function renderActive() {
     meta.append(dom, sub);
 
     const right = document.createElement('div');
-    right.style.display = 'flex';
-    right.style.alignItems = 'center';
-    right.style.gap = '10px';
+    right.style.cssText = 'display:flex;align-items:center;gap:10px';
 
     const time = document.createElement('span');
     time.className = 'active-time';
@@ -169,33 +247,39 @@ async function renderActive() {
 
 async function endSession(id) {
   const state = await FL.getAll();
+  if (state.settings.hardened) {
+    const ok = await requireCommitment('Hardened mode is on. To end this lock early, type the phrase below.');
+    if (!ok) return;
+  }
   state.blocks = state.blocks.filter(b => b.id !== id);
   await FL.set({ blocks: state.blocks });
   renderActive();
 }
 
-// live countdown for the active list
-function startTick() {
-  if (tickTimer) clearInterval(tickTimer);
-  tickTimer = setInterval(() => {
-    const now = Date.now();
-    let stale = false;
-    activeList.querySelectorAll('.active-time').forEach(el => {
-      const end = Number(el.dataset.end);
-      const left = end - now;
-      if (left <= 0) stale = true;
-      el.textContent = FL.formatRemaining(left);
-    });
-    if (stale) renderActive();
-  }, 1000);
-}
+// ---------------------------------------------------------------- ticking
+setInterval(() => {
+  const now = Date.now();
+  let stale = false;
+  activeList.querySelectorAll('.active-time').forEach(el => {
+    const left = Number(el.dataset.end) - now;
+    if (left <= 0) stale = true;
+    el.textContent = FL.formatRemaining(left);
+  });
+  if (!pauseActive.hidden) {
+    const left = Number(pauseActive.dataset.until) - now;
+    if (left <= 0) renderPause();
+    else pauseCountdown.textContent = FL.formatRemaining(left);
+  }
+  if (stale) renderActive();
+}, 1000);
 
 document.getElementById('openOptions').addEventListener('click', e => {
   e.preventDefault();
   chrome.runtime.openOptionsPage();
 });
 
+renderPresets();
 renderChips();
 syncStart();
 renderActive();
-startTick();
+renderPause();

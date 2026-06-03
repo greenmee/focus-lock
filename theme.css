@@ -1,4 +1,6 @@
-/* theme.css — calm & minimal design tokens, shared by every page. */
+/* theme.css — calm & minimal design tokens, shared by every page.
+ * Light is the default; dark is applied either explicitly via
+ * <html data-theme="dark"> or, in "auto" mode, by the OS preference. */
 :root {
   --paper:      #F6F5F0;  /* warm off-white background          */
   --surface:    #FFFFFF;  /* cards                              */
@@ -9,10 +11,41 @@
   --sage-tint:  #E6EFEA;  /* soft fills                         */
   --line:       #E4E6E1;  /* hairline borders                   */
   --danger:     #B07A6E;  /* muted clay, never alarming red     */
+  --captcha-bg: #EFEEE7;
   --radius:     16px;
   --radius-sm:  10px;
   --shadow:     0 1px 2px rgba(44,58,51,.04), 0 8px 24px rgba(44,58,51,.06);
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Dark palette — calm, low-contrast, easy at night. */
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"], :root:not([data-theme]) {
+    --paper:      #161A18;
+    --surface:    #1E2421;
+    --ink:        #E7ECE8;
+    --ink-soft:   #9DACA3;
+    --sage:       #7FA890;
+    --sage-deep:  #9CC2AC;
+    --sage-tint:  #25302A;
+    --line:       #2D3531;
+    --danger:     #C99287;
+    --captcha-bg: #2A322D;
+    --shadow:     0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"] {
+  --paper:      #161A18;
+  --surface:    #1E2421;
+  --ink:        #E7ECE8;
+  --ink-soft:   #9DACA3;
+  --sage:       #7FA890;
+  --sage-deep:  #9CC2AC;
+  --sage-tint:  #25302A;
+  --line:       #2D3531;
+  --danger:     #C99287;
+  --captcha-bg: #2A322D;
+  --shadow:     0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
 }
 
 * { box-sizing: border-box; }

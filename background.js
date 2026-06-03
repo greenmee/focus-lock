@@ -20,12 +20,16 @@ function lockScreenUrl(match, originalUrl) {
   return chrome.runtime.getURL('blocked.html') + '?' + params.toString();
 }
 
-async function handleNavigation(tabId, url, frameId) {
+async function handleNavigation(tabId, url, frameId, countHit) {
   if (frameId !== 0) return;          // only top-level frames
   if (!url || !SCHEMES.test(url)) return; // ignore chrome://, extension pages, etc.
 
   const match = await FL.evaluate(url);
   if (match) {
+    if (countHit) {
+      // record one "blocked hit" + mark today as an active focus day (for streaks)
+      FL.recordEvent({ blockedHits: 1, markFocusDay: true });
+    }
     try {
       await chrome.tabs.update(tabId, { url: lockScreenUrl(match, url) });
     } catch (e) {
@@ -34,15 +38,15 @@ async function handleNavigation(tabId, url, frameId) {
   }
 }
 
-// Full page loads.
+// Full page loads — these count as a blocked hit.
 chrome.webNavigation.onBeforeNavigate.addListener(d => {
-  handleNavigation(d.tabId, d.url, d.frameId);
+  handleNavigation(d.tabId, d.url, d.frameId, true);
 });
 
-// In-app (SPA) navigations — catches things like moving around inside YouTube
-// after a lock has begun.
+// In-app (SPA) navigations — catches moving around inside YouTube after a lock
+// begins. Not counted as a hit to avoid inflating stats on a single visit.
 chrome.webNavigation.onHistoryStateUpdated.addListener(d => {
-  handleNavigation(d.tabId, d.url, d.frameId);
+  handleNavigation(d.tabId, d.url, d.frameId, false);
 });
 
 // ---- badge: show how many sites are locked right now --------------------
@@ -50,6 +54,11 @@ async function refreshBadge() {
   try {
     const state = await FL.getAll();
     const now = Date.now();
+    if (state.pause && state.pause.until > now) {
+      await chrome.action.setBadgeBackgroundColor({ color: '#9DACA3' });
+      await chrome.action.setBadgeText({ text: '||' });
+      return;
+    }
     let count = 0;
     for (const b of state.blocks) {
       if (b.endTime > now && !(b.unlockedUntil && b.unlockedUntil > now)) count++;

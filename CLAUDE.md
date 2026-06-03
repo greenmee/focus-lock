@@ -45,12 +45,37 @@ Plain JS + HTML + CSS, no build step. Load unpacked via `chrome://extensions`.
 blocks:          [{ id, domain, label, endTime, createdAt, unlockedUntil }]
 schedules:       [{ id, domain, label, days:[0-6], start:"HH:MM", end:"HH:MM" }]
 scheduleUnlocks: { [scheduleId]: timestampMs }   // unlocked until this time
-settings:        { captchaRounds: 10, challengeEnabled: true }
+presets:         [{ id, name, domains:[] }]      // reusable block-list groups
+domainMessages:  { [domain]: "custom lock-screen message" }
+pause:           { until: timestampMs }          // global: all blocking off while until > now
+settings:        { captchaRounds, challengeEnabled, hardened, theme:'auto'|'light'|'dark' }
+stats:           { blockedHits, resisted, brokeThrough, sessionsStarted, focusMin,
+                   streak, bestStreak, lastActiveDay, history:{ 'YYYY-MM-DD': {...} } }
 ```
 
-- A **session** unlock sets `block.unlockedUntil = block.endTime`.
-- A **schedule** unlock sets `scheduleUnlocks[id] = end-of-current-window`.
-- `days` uses JS `Date.getDay()` numbering: `0 = Sunday`.
+- `getAll()` merges DEFAULTS into nested `settings`/`stats`/`pause` so old saved data
+  picks up new keys without a migration. Always read state via `getAll()`.
+- A **session** unlock sets `block.unlockedUntil = block.endTime`; a **schedule**
+  unlock sets `scheduleUnlocks[id] = end-of-current-window`.
+- `days` uses JS `Date.getDay()` numbering: `0 = Sunday`. Overnight windows
+  (`end <= start`) are handled in `scheduleActive` via the previous-day branch.
+- `evaluate()` short-circuits to "allowed" while `pause.until > now`.
+- Stats are written through `recordEvent()` (background records `blockedHits`;
+  popup records `sessions`/`focusMin`; the lock screen records `resisted`/`brokeThrough`).
+  `markFocusDay` drives the streak.
+
+### v2 behaviors
+
+- **Hardened mode** (`settings.hardened`): every escape hatch — ending a lock early,
+  pausing while locks are active, and breaking through on the lock screen — requires
+  typing `FocusLock.COMMITMENT_PHRASE` exactly. Soft mode stays the default.
+- **Challenge variety:** each round of the lock-screen gauntlet randomly picks one of
+  `captcha | math | sentence | wait`. The eyebrow message rotates through
+  `PRODUCTIVITY_MSGS` after every solved round. Round count = `settings.captchaRounds`.
+- **Theming:** `FocusLock.applyTheme()` sets `<html data-theme>`; `theme.css` resolves
+  light/dark (auto follows `prefers-color-scheme`). common.js auto-applies on every page.
+- **Presets** fill the popup's staging chips; **domainMessages** override the lock-screen
+  copy for a specific domain; **stats** live only on the options page.
 
 ### Key data flows
 
